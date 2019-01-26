@@ -1,7 +1,8 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[1]:
+
 
 import os
 import slp_data
@@ -12,6 +13,7 @@ import numpy as np
 # split recordings to train test and validation sets
 
 # In[2]:
+
 
 all_recs = []
 for f in os.listdir(config.data_dir):
@@ -26,7 +28,9 @@ num_recs = len(all_recs)
 
 
 
+
 # In[3]:
+
 
 # Training Parameters
 num_steps = 1000
@@ -44,6 +48,7 @@ dropout = 0.2  # Dropout, probability to keep units
 
 # In[4]:
 
+
 import tensorflow as tf
 
 # tf Graph input
@@ -54,19 +59,19 @@ keep_prob = tf.placeholder(tf.float32)  # dropout (keep probability)
 #your codes here
 #  Store layers weight & bias
 # The first two convolutional layer
-w_c_1 = tf.Variable(tf.random_normal([500, 1, 1, 32], stddev=0.01))
-w_c_2 = tf.Variable(tf.random_normal([500, 1, 32, 64], stddev=0.01))
-b_c_1 = tf.Variable(tf.random_normal([32], stddev=0.1))
-b_c_2 = tf.Variable(tf.random_normal([64], stddev=0.1))
+w_c_1 = tf.Variable(tf.random_normal([50, 1, 1, 128], stddev=0.01))
+w_c_2 = tf.Variable(tf.random_normal([50, 1, 128, 128], stddev=0.01))
+b_c_1 = tf.Variable(tf.random_normal([128], stddev=0.1))
+b_c_2 = tf.Variable(tf.random_normal([128], stddev=0.1))
 
 # The second two convolutional layer weights
-w_c_3 = tf.Variable(tf.random_normal([50, 1, 64, 64], stddev=0.01))
-w_c_4 = tf.Variable(tf.random_normal([50, 1, 64, 64], stddev=0.01))
-b_c_3 = tf.Variable(tf.random_normal([64], stddev=0.1))
-b_c_4 = tf.Variable(tf.random_normal([64], stddev=0.1))
+w_c_3 = tf.Variable(tf.random_normal([50, 1, 128, 128], stddev=0.01))
+w_c_4 = tf.Variable(tf.random_normal([50, 1, 128, 128], stddev=0.01))
+b_c_3 = tf.Variable(tf.random_normal([128], stddev=0.1))
+b_c_4 = tf.Variable(tf.random_normal([128], stddev=0.1))
 
 # Fully connected weight
-w_f_1 = tf.Variable(tf.random_normal([125*15*64, 1024], stddev=0.01))
+w_f_1 = tf.Variable(tf.random_normal([125*15*128, 1024], stddev=0.01))
 b_f_1 = tf.Variable(tf.random_normal([1024], stddev=0.1))
 
 # output layer weight
@@ -105,6 +110,7 @@ fc1 = tf.nn.dropout(fc1, keep_prob)
 
 # In[5]:
 
+
 #your codes here
 # Output, class prediction
 logits = tf.add(tf.matmul(fc1, w_out), b_out)
@@ -124,6 +130,7 @@ accuracy = tf.reduce_mean(tf.cast(tf.equal(correct_pred, y_true), tf.float32))
 
 
 # In[6]:
+
 
 def print_measures(predicted_labels, true_labels):
     from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
@@ -234,7 +241,9 @@ for train_records_index, test_records_index in kf.split(all_recs):
 
 
 
+
 # In[ ]:
+
 
 
 

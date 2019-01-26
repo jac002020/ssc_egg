@@ -1,5 +1,6 @@
 .idea
 *.pyc
+log.*.txt
 .ipynb_checkpoints
 datasets
 __pycache__

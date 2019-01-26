@@ -7,6 +7,8 @@ import config
 
 class DataSet(object):
     all_labels = ['1', '2', '3', '4', 'R', 'W', 'MT', 'M']
+    keel_labels = ['1', '2', '3', '4', 'R', 'W']
+
     def __init__(self,
                  data_dir,
                  recordings,
@@ -32,7 +34,7 @@ class DataSet(object):
         if circulatar:
             for r in itertools.cycle(self.recordings):
                 x_r = self.read_samples("{}.txt".format(r))
-                y_r = self.read_labels("{}.lbl".format(r), self.one_hot)
+                y_r = self.read_labels("{}.lbl".format(r))
                 for r_index in range(len(x_r)):
                     x[index,:] = x_r[r_index,:]
                     y[index] = y_r[r_index]
@@ -46,7 +48,7 @@ class DataSet(object):
         else :
             for r in self.recordings:
                 x_r = self.read_samples("{}.txt".format(r))
-                y_r = self.read_labels("{}.lbl".format(r), self.one_hot)
+                y_r = self.read_labels("{}.lbl".format(r))
                 for r_index in range(len(x_r)):
                     x[index,:] = x_r[r_index,:]
                     y[index] = y_r[r_index]
@@ -62,13 +64,9 @@ class DataSet(object):
         samples = np.loadtxt(rec_txt_file)
         return samples.reshape((-1, 250*30))
 
-    def read_labels(self, rec_lbl_file, one_hot=False):
+    def read_labels(self, rec_lbl_file):
         labels = np.loadtxt(rec_lbl_file, dtype=np.str)
         labels = self.labels_to_index(labels)
-        if one_hot:
-            oh_labels = np.zeros((len(labels), len(self.all_labels)))
-            oh_labels[np.arange(len(labels)), labels] = 1
-            return oh_labels
         return labels
 
     def labels_to_index(self, labels):
@@ -98,6 +96,7 @@ class DataSet(object):
                 y_r = self.read_labels("{}.lbl".format(r))
                 np.save(saved_x, x_r)
                 np.save(saved_y, y_r)
+
             print("recording {:3d}/{} : {} with x,y shapes: {} {}".format(index, len(self.recordings), r, x_r.shape, y_r.shape))
             index += 1
             x = np.vstack((x, x_r))
