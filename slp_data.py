@@ -1,13 +1,14 @@
-
-import tensorflow as tf
 import numpy as np
 import itertools
 import os
-import config
+from sklearn.utils import shuffle as shuff
 
 class DataSet(object):
     all_labels = ['1', '2', '3', '4', 'R', 'W', 'MT', 'M']
-    keel_labels = ['1', '2', '3', '4', 'R', 'W']
+    keep_label_max_index = len(['1', '2', '3', '4', 'R', 'W'])
+    # keep_labels must be selected from first elements of all_labels
+    # because label_to_index will use index from 0 to len(all_labels)-1
+    # labels indexed with number more than or equal to keep_label_max_index will be discarded.
 
     def __init__(self,
                  data_dir,
@@ -69,9 +70,12 @@ class DataSet(object):
         labels = self.labels_to_index(labels)
         return labels
 
+    def index_of_label(self, label):
+        return self.all_labels.index(label)
+
     def labels_to_index(self, labels):
         for i in range(len(labels)):
-            labels[i] = self.all_labels.index(labels[i])
+            labels[i] = self.index_of_label(labels[i])
         return labels.astype(dtype=np.int)
 
     def one_hot_encoder(self, labels):
@@ -96,16 +100,23 @@ class DataSet(object):
                 y_r = self.read_labels("{}.lbl".format(r))
                 np.save(saved_x, x_r)
                 np.save(saved_y, y_r)
+            y_keep = np.argwhere(y_r < self.keep_label_max_index).flatten()
+            y_away = np.argwhere(y_r >= self.keep_label_max_index).flatten()
+            n_items_removing = len(y_r) - len(y_keep)
+            if n_items_removing > 0:
+                print("removing {} items with irrelevant labels from {} items".format(n_items_removing, len(y_r)))
 
+            x_r = x_r[y_keep]
+            y_r = y_r[y_keep]
             print("recording {:3d}/{} : {} with x,y shapes: {} {}".format(index, len(self.recordings), r, x_r.shape, y_r.shape))
             index += 1
             x = np.vstack((x, x_r))
             y = np.concatenate((y, y_r))
-            
+
         if self.one_hot:
             y = self.one_hot_encoder(y)
-        from sklearn.utils import shuffle as shuff
-        x, y = shuff(x, y, random_state=0)
+        if shuffle:
+            x, y = shuff(x, y, random_state=0)
         self._x = x
         self._y = y
         print("x,y has been read with shape: {} {}".format(x.shape, y.shape))

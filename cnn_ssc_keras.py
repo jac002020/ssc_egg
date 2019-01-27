@@ -144,10 +144,10 @@ from sklearn.model_selection import KFold
 from classification_report import ClassificationReport
 
 fold_results = []
-kf = KFold(n_splits=10, shuffle=True)
+kf = KFold(n_splits=2, shuffle=True)
 for train_records_index, test_records_index in kf.split(all_recs):
     
-    train_recs = all_recs[train_records_index]
+    train_recs = ['/home/sajad/MIT-BIH-wav-small/slp14']
     test_recs = all_recs[test_records_index]
     
     val_recs = train_recs[-1:]
